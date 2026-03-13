@@ -63,7 +63,7 @@ jobs:
     #     -p ${{ secrets.ACR_PASSWORD }}
 
     - name: Login to ACR
-      run: az acr login --name ${{ secrets.ACR_USERNAME }}
+      run: az acr login --name playwrightacr1980
 
 
 # -------------------------------
