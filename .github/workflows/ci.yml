@@ -1,4 +1,4 @@
-name: Playwright CI + Azure Deployment
+name: Playwright CI
 
 on:
   push:
@@ -92,102 +92,102 @@ jobs:
 #         fi
 
 
-# -------------------------------
-# Ensure ACR Exists
-# -------------------------------
+# # -------------------------------
+# # Ensure ACR Exists
+# # -------------------------------
 
-    - name: Ensure ACR Exists
-      run: |
-        if az acr show --name ${{ vars.ACR_NAME }} --resource-group ${{ vars.RESOURCE_GROUP }} > /dev/null 2>&1; then
-          echo "ACR already exists"
-        else
-          echo "Creating ACR..."
-          az acr create \
-            --name ${{ vars.ACR_NAME }} \
-            --resource-group ${{ vars.RESOURCE_GROUP }} \
-            --sku Basic \
-            --location ${{ vars.LOCATION }} \
-            --admin-enabled true
-        fi
-
-
-# -------------------------------
-# Login to ACR
-# -------------------------------
-
-    - name: Login to ACR
-      run: az acr login --name ${{ vars.ACR_NAME }}
+#     - name: Ensure ACR Exists
+#       run: |
+#         if az acr show --name ${{ vars.ACR_NAME }} --resource-group ${{ vars.RESOURCE_GROUP }} > /dev/null 2>&1; then
+#           echo "ACR already exists"
+#         else
+#           echo "Creating ACR..."
+#           az acr create \
+#             --name ${{ vars.ACR_NAME }} \
+#             --resource-group ${{ vars.RESOURCE_GROUP }} \
+#             --sku Basic \
+#             --location ${{ vars.LOCATION }} \
+#             --admin-enabled true
+#         fi
 
 
-# -------------------------------
-# Ensure Container Apps Environment Exists
-# -------------------------------
+# # -------------------------------
+# # Login to ACR
+# # -------------------------------
 
-    - name: Ensure Container Apps Environment Exists
-      run: |
-        if az containerapp env show \
-          --name ${{ vars.CONTAINER_ENV_NAME }} \
-          --resource-group ${{ vars.RESOURCE_GROUP }} > /dev/null 2>&1; then
+#     - name: Login to ACR
+#       run: az acr login --name ${{ vars.ACR_NAME }}
+
+
+# # -------------------------------
+# # Ensure Container Apps Environment Exists
+# # -------------------------------
+
+#     - name: Ensure Container Apps Environment Exists
+#       run: |
+#         if az containerapp env show \
+#           --name ${{ vars.CONTAINER_ENV_NAME }} \
+#           --resource-group ${{ vars.RESOURCE_GROUP }} > /dev/null 2>&1; then
           
-          echo "Container Apps Environment exists"
+#           echo "Container Apps Environment exists"
           
-        else
+#         else
           
-          echo "Creating Container Apps Environment..."
+#           echo "Creating Container Apps Environment..."
           
-          az containerapp env create \
-            --name ${{ vars.CONTAINER_ENV_NAME }} \
-            --resource-group ${{ vars.RESOURCE_GROUP }} \
-            --location ${{ vars.LOCATION }}
-        fi
+#           az containerapp env create \
+#             --name ${{ vars.CONTAINER_ENV_NAME }} \
+#             --resource-group ${{ vars.RESOURCE_GROUP }} \
+#             --location ${{ vars.LOCATION }}
+#         fi
 
 
-# -------------------------------
-# Build Docker Image
-# -------------------------------
+# # -------------------------------
+# # Build Docker Image
+# # -------------------------------
 
-    - name: Build Docker Image
-      run: |
-        docker build -t ${{ vars.ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }} .
-
-
-# -------------------------------
-# Push Docker Image
-# -------------------------------
-
-    - name: Push Docker Image
-      run: |
-        docker push ${{ vars.ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }}
+#     - name: Build Docker Image
+#       run: |
+#         docker build -t ${{ vars.ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }} .
 
 
-# -------------------------------
-# Deploy Container App
-# -------------------------------
+# # -------------------------------
+# # Push Docker Image
+# # -------------------------------
 
-    - name: Deploy Container App
-      run: |
+#     - name: Push Docker Image
+#       run: |
+#         docker push ${{ vars.ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }}
 
-        if az containerapp show \
-          --name ${{ vars.CONTAINER_APP_NAME }} \
-          --resource-group ${{ vars.RESOURCE_GROUP }} > /dev/null 2>&1; then
+
+# # -------------------------------
+# # Deploy Container App
+# # -------------------------------
+
+#     - name: Deploy Container App
+#       run: |
+
+#         if az containerapp show \
+#           --name ${{ vars.CONTAINER_APP_NAME }} \
+#           --resource-group ${{ vars.RESOURCE_GROUP }} > /dev/null 2>&1; then
           
-          echo "Container App exists. Updating image..."
+#           echo "Container App exists. Updating image..."
           
-          az containerapp update \
-            --name ${{ vars.CONTAINER_APP_NAME }} \
-            --resource-group ${{ vars.RESOURCE_GROUP }} \
-            --image ${{ vars.ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }}
+#           az containerapp update \
+#             --name ${{ vars.CONTAINER_APP_NAME }} \
+#             --resource-group ${{ vars.RESOURCE_GROUP }} \
+#             --image ${{ vars.ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }}
 
-        else
+#         else
           
-          echo "Container App does not exist. Creating..."
+#           echo "Container App does not exist. Creating..."
           
-          az containerapp create \
-            --name ${{ vars.CONTAINER_APP_NAME }} \
-            --resource-group ${{ vars.RESOURCE_GROUP }} \
-            --environment ${{ vars.CONTAINER_ENV_NAME }} \
-            --image ${{ vars.ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }} \
-            --target-port 3000 \
-            --ingress external \
-            --registry-server ${{ vars.ACR_LOGIN_SERVER }}
-        fi
+#           az containerapp create \
+#             --name ${{ vars.CONTAINER_APP_NAME }} \
+#             --resource-group ${{ vars.RESOURCE_GROUP }} \
+#             --environment ${{ vars.CONTAINER_ENV_NAME }} \
+#             --image ${{ vars.ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }} \
+#             --target-port 3000 \
+#             --ingress external \
+#             --registry-server ${{ vars.ACR_LOGIN_SERVER }}
+#         fi
