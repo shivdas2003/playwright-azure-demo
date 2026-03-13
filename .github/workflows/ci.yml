@@ -73,14 +73,14 @@ jobs:
 # Docker Login to ACR
 # -------------------------------
 
-    - name: Login to Azure Container Registry
-      run: |
-        docker login ${{ secrets.AZURE_ACR_LOGIN_SERVER }} \
-        -u ${{ secrets.AZURE_ACR_USERNAME }} \
-        -p ${{ secrets.AZURE_ACR_PASSWORD }}
+    # - name: Login to Azure Container Registry
+    #   run: |
+    #     docker login ${{ secrets.AZURE_ACR_LOGIN_SERVER }} \
+    #     -u ${{ secrets.AZURE_ACR_USERNAME }} \
+    #     -p ${{ secrets.AZURE_ACR_PASSWORD }}
 
-    # - name: Login to ACR
-    #   run: az acr login --name ${{ secrets.AZURE_ACR_USERNAME }}
+    - name: Login to ACR
+      run: az acr login --name ${{ secrets.AZURE_ACR_USERNAME }}
 
 
 # -------------------------------
