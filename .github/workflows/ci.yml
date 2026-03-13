@@ -56,14 +56,14 @@ jobs:
 # Docker Login to ACR
 # -------------------------------
 
-    # - name: Login to Azure Container Registry
-    #   run: |
-    #     docker login ${{ secrets.ACR_LOGIN_SERVER }} \
-    #     -u ${{ secrets.ACR_USERNAME }} \
-    #     -p ${{ secrets.ACR_PASSWORD }}
+    - name: Login to Azure Container Registry
+      run: |
+        docker login ${{ secrets.AZURE_ACR_LOGIN_SERVER }} \
+        -u ${{ secrets.AZURE_ACR_USERNAME }} \
+        -p ${{ secrets.AZURE_ACR_PASSWORD }}
 
-    - name: Login to ACR
-      run: az acr login --name playwrightacr1980
+    # - name: Login to ACR
+    #   run: az acr login --name ${{ secrets.AZURE_ACR_USERNAME }}
 
 
 # -------------------------------
@@ -72,7 +72,7 @@ jobs:
 
     - name: Build Docker Image
       run: |
-        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }} .
+        docker build -t ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }} .
 
 
 # -------------------------------
@@ -81,7 +81,7 @@ jobs:
 
     - name: Push Docker Image
       run: |
-        docker push ${{ secrets.ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }}
+        docker push ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }}
 
 
 # -------------------------------
@@ -94,4 +94,4 @@ jobs:
         az containerapp update \
           --name playwright-runner \
           --resource-group rg-playwright \
-          --image ${{ secrets.ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }}
+          --image ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/playwright-tests:${{ github.sha }}
